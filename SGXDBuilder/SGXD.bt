@@ -1,0 +1,457 @@
+//------------------------------------------------
+//--- 010 Editor v10.0.2 Binary Template
+//
+//      File: Sony SGXD Audio Bank
+//   Authors: Xenn, Nenkai
+//   Version: 
+//   Purpose: Music Files
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+LittleEndian();
+
+/* Used by many games developed/published by Sony
+ * Private SCE library */
+
+// Information taken from debug symbols, Folklore PS3
+
+local int curPos;
+
+typedef uint sguint32;
+typedef int sgint32;
+typedef short sgint16;
+typedef byte sgint8;
+typedef ubyte sguint8;
+
+struct tagSgxdChunkHeader
+{
+  sguint32 ident <format=hex, fgcolor=cPurple>;
+  sgint32 size <format=hex, fgcolor=cGreen>;
+};
+typedef tagSgxdChunkHeader SgxdChunkHeader;
+
+typedef enum <byte> SGXRequest
+{
+   gSgxSndWaveStrSet = 0, // 3
+   gSgxSndNoteSet = 1, // 1
+   gSgxSndSeqSet = 2, // 2
+   gSgxSndWaveSet = 3, // 0 - Direct call to sound
+
+   SgxBusCalcSetupReqBuf = 4, // 16
+   SgxBusCallEffectParam = 5, // 17
+   SgxConfCall = 6,
+} SGXRequest;
+
+struct tagSgxdRgnHeader
+{
+  sgint32 flags;
+  sgint32 nrgn;
+  
+  struct
+  {
+    sgint32 aRgn[2] <format=hex>;
+  } arr[nrgn];
+};
+typedef tagSgxdRgnHeader SgxdRgnHeader;
+
+struct tagSgxdRgn
+{
+  sgint32 flags;
+  sgint32 name;
+  sgint32 ssize;
+  sgint8 prior;
+  sguint8 gpid;
+  sgint8 gpmode;
+  sgint8 gpnum;
+  sgint32 resv1;
+  sgint32 ef;
+  sgint8 noteL;
+  sgint8 noteH;
+  sgint16 resv2;
+  sguint8 baseN;
+  sgint8 baseC;
+  sgint16 pitch;
+  sgint16 vol0;
+  sgint16 vol1;
+  sgint16 dry;
+  sgint16 wet;
+  sgint32 env0;
+  sgint32 env1;
+  sgint8 volcv;
+  sgint8 pancv;
+  sgint8 bendL;
+  sgint8 bendH;
+  sgint32 wave;
+};
+typedef tagSgxdRgn SgxdRgn;
+
+//////////////// Name - NAME
+struct tagSgxdName
+{
+  
+  BitfieldDisablePadding();
+
+  struct Src
+  {  
+    byte RequestIndexMinor : 8;
+    byte unk : 8;
+    short RequestIndex : 8;
+    byte Unk : 4;
+    SGXRequest RequestType : 4;
+  } src
+;
+
+  sgint32 name <format=hex, fgcolor=cRed, comment="Offset to name">;
+};
+typedef tagSgxdName SgxdName <optimize=false>;
+
+struct tagSgxdNameHeader
+{
+  sgint32 flags;
+  sgint32 nname <fgcolor=cGreen>;
+  SgxdName aName[nname];
+};
+typedef tagSgxdNameHeader SgxdNameHeader;
+
+/////////////// Wave - WAVE
+struct tagSgxdWave
+{
+  sgint32 flags;
+  sgint32 name <format=hex, fgcolor=cRed, comment="Offset to name of wave">;
+  enum <sgint8>  
+  {
+    // sgxFormSampleToByte(sgint32 form, sgint32 ch, sgint32 par0, sgint32 par1, sgbool isBeg, sgint32 smpl)
+    //   PSADPCM = 16 * smpl / 28 * ch
+    //   ShortAPCDM = 4 * smpl / 6 * ch
+    //   AC3 = 
+          /* if ( !isBeg )
+            v8 = smpl + 1791;
+          result = v8 / 0x600 * par1 */
+    //   10 = 4 * smpl * ch
+    //   11 = 4 * smpl * ch
+
+    // sgxGetFormUnitByte(sgint32 form, sgint32 ch, sgint32 par0, sgint32 par1)
+    //   PSADPCM = 16 * ch
+    //   ShortAPCDM = 4 * ch
+    //   AC3 = return par1
+    //   Unk10 = 4 * ch
+    //   Unk11 = 4 * ch
+    //   default return par1
+    PCM16LE = 0,
+    PCM16BE = 1, 
+    OGG_VORBIS = 2, // Confirm?
+    PSADPCM = 3,
+    ATRAC3plus = 4,
+    ShortAPCDM = 5,
+    AC3 = 6,
+    Unk10 = 10, 
+    Unk11 = 11, 
+  } form <comment="Format">; // {PCM = 1, OGG = 2, PSADPCM = 3, ATRAC3plus = 4, ShortPSADPCM = 5, AC3 = 6} Type;
+  
+  sgint8 ch <comment="Channels">;
+  sgint8 nloop;
+  sgint8 resv <comment="Reserved">;
+  sgint32 freq <comment="Sample Rate">; // //Doesn't seem to matter for PSADPCM
+  sgint32 par0 <comment="BitRate">;
+  sgint32 par1 <comment="640 in AC3 = 640kbps">;
+  sgint16 volL <format=hex, comment="Volume Left">;
+  sgint16 volR <format=hex, comment="Volume Right">;
+  sgint32 wbeg <comment="Loop Start Position">;
+  sgint32 wend <comment="Loop Start Samples">;
+  sgint32 lbeg <comment="Loop Begin Sample - Make this the starting point of the loop from Awave">;
+  sgint32 lend <comment="Loop End Sample - Make this the sample size of the audio">;
+  sgint32 bsize <format=hex, comment="ChannelDataSize">;
+  sgint32 aBody[2] <format=hex>;
+};
+typedef tagSgxdWave SgxdWave;
+
+struct tagSgxdWaveHeader
+{
+  sgint32 flags;
+  sgint32 nwave <fgcolor=cGreen>;
+  SgxdWave aWave[nwave];
+};
+typedef tagSgxdWaveHeader SgxdWaveHeader;
+
+////////// Sequence - SEQD
+
+struct tagSgxdSeq
+{
+  sgint32 flags;
+  sgint32 name <format=hex, fgcolor=cRed, comment="Offset to name of sequence">;
+  sgint16 form <comment="Format of sequence">;
+  sgint16 reso;
+  sgint16 volL <format=hex, comment="Volume Left">;
+  sgint16 volR <format=hex, comment="Volume Right">;
+  sgint32 size <format=hex, comment="Command Buffer Size">;
+  sguint8 data[size] <comment="Command Buffer">;
+};
+typedef tagSgxdSeq SgxdSeq;
+
+struct tagSgxdSeqGrp
+{
+  sgint32 flags;
+  sgint32 nofs;
+  sgint32 aOfs[nofs];
+
+  local int i = 0;
+  for (i = 0; i < nofs; i++)
+  {
+    if (aOfs[i] != 0)
+    {
+        FSeek(aOfs[i]);
+        SgxdSeq seq;
+    }
+  }
+};
+typedef tagSgxdSeqGrp SgxdSeqGrp;
+
+struct tagSgxdSeqHeader
+{
+  sgint32 flags;
+  sgint32 nofs <fgcolor=cGreen>;
+  sgint32 aOfs[nofs] <format=hex, fgcolor=cRed>;
+
+  local int i = 0;
+  for (i = 0; i < nofs; i++)
+  {
+    if (aOfs[i] != 0)
+    {
+        FSeek(aOfs[i]);
+        SgxdSeqGrp seq;
+    }
+  }
+};
+typedef tagSgxdSeqHeader SgxdSeqHeader;
+
+//////////////// Bus Param/Text - CONF
+struct tagSgxdText
+{
+  sgint32 flags;
+  sgint32 name;
+  sgint32 ofs;
+};
+typedef tagSgxdText SgxdText;
+
+struct tagSgxdTextHeader
+{
+  sgint32 flags;
+  sgint32 num;
+  SgxdText aText[num];
+};
+typedef tagSgxdTextHeader SgxdTextHeader;
+
+/////////////////////////// Tuning - TUNE
+struct tagSgxdTuning
+{
+  sgint32 flags;
+  sgint32 rname;
+  sgint32 type;
+  sgint32 def;
+  sgint32 resv0;
+  sgint32 num;
+  sgint32 nameofs;
+  sgint32 dataofs;
+};
+typedef tagSgxdTuning SgxdTuning;
+
+struct tagSgxdTuningHeader
+{
+  sgint32 flags;
+  sgint32 ntuning;
+  SgxdTuning aTuning[];
+};
+typedef tagSgxdTuningHeader SgxdTuningHeader;
+
+////////////////////////// WaveSurround - WSUR
+struct tagSgxdWaveSurround
+{
+  sgint8 flags;
+  sgint8 ch;
+  sgint16 angle;
+  sgint16 dist;
+  sgint16 level;
+};
+typedef tagSgxdWaveSurround SgxdWaveSurround;
+
+struct tagSgxdWaveSurroundHeader
+{
+  sgint32 flags;
+  sgint32 nwave;
+  struct
+  {
+    sgint32 aSur[2] <format=hex>;
+  } arr[nwave];
+};
+typedef tagSgxdWaveSurroundHeader SgxdWaveSurroundHeader;
+
+/////////////////////////// WaveMarker - WMRK
+struct tagSgxdWaveMarker
+{
+  sgint32 name;
+  sgint32 pos;
+  sgint32 len;
+};
+typedef tagSgxdWaveMarker SgxdWaveMarker;
+
+struct tagSgxdWaveMarkerHeader
+{
+  sgint32 flags;
+  sgint32 nwave;
+  struct
+  {
+    sgint32 aMarker[2] <format=hex>;
+  } arr[nwave];
+};
+typedef tagSgxdWaveMarkerHeader SgxdWaveMarkerHeader;
+
+////////////////////////// ASDR
+struct tagSgxdAdsrHeader
+{
+  sgint32 flags;
+  sgint32 nadsr;
+  sguint32 aAdsr[nadsr];
+};
+typedef tagSgxdAdsrHeader SgxdAdsrHeader;
+
+///////////////////////// Bus Setup - BUSS
+struct tagSgxdBusEffect
+{
+  sgint32 flags;
+  sgint32 name;
+  sgint32 module;
+  sgint8 aCAssign[8];
+  sgint8 nibus;
+  sgint8 nobus;
+  sgint16 resv0;
+  sgint8 aIBus[4];
+  sgint8 aOBus[4];
+  sgint16 aIGain[4];
+  sgint16 aOGain[4];
+  sgint32 pbody;
+  sgint32 resv1;
+  sgint32 resv2;
+  sgint32 resv3;
+};
+typedef tagSgxdBusEffect SgxdBusEffect;
+
+struct tagSgxdBusSetup
+{
+  sgint32 flags;
+  sgint32 name;
+  sgint8 nunit;
+  sgint8 neffect;
+  sgint8 munit;
+  sgint8 resv0;
+  sgint32 resv1;
+  sgint32 aUnit;
+  sgint32 aEffect;
+  sgint32 oper;
+  sgint32 oparam;
+  sgint32 resv2;
+  sgint32 resv3;
+  sgint32 resv4;
+  sgint32 resv5;
+};
+typedef tagSgxdBusSetup SgxdBusSetup;
+
+struct tagSgxdBusSetupHeader
+{
+  sgint32 flags;
+  sgint32 nsetup;
+  SgxdBusSetup aSetup[nsetup];
+};
+typedef tagSgxdBusSetupHeader SgxdBusSetupHeader;
+
+struct tagSgxdBusUnit
+{
+  sgint32 flags;
+  sgint32 name;
+  sgint32 resv0;
+  sgint32 resv1;
+};
+typedef tagSgxdBusUnit SgxdBusUnit;
+
+////////////////////////// MAIN HEADER
+struct tagSgxdFileHeader
+{
+  sguint32 SGXD <format=hex, comment="Magic">;
+  sgint32 name <format=hex, fgcolor=cRed, comment="Actual SGXD file name offset">;
+  sgint32 hsize <format=hex, comment="Header Size">;
+  sgint32 bsize <format=hex, comment="Body Size, 1 bit unk, 31 bit size">;
+};
+
+typedef tagSgxdFileHeader SgxdFileHeader;
+
+struct SGXD
+{
+    SgxdFileHeader header;
+
+    local int i = 0;
+    local int baseChunkDataPos;
+    local int done = false;
+
+    while (!FEof())
+    {
+        SgxdChunkHeader chunkHeader;
+        baseChunkDataPos = FTell();
+
+        switch (chunkHeader[i].ident)
+        {
+            case 0x454D414E: // NAME
+                SgxdNameHeader pName;
+                break;
+
+            case 0x444E4752: // RGND:
+                SgxdRgnHeader pRgn;
+                break;
+
+            case 0x45564157: // WAVE
+                SgxdWaveHeader pWave;
+                break;
+    
+            case 0x52555357: // WSUR
+                SgxdWaveSurroundHeader pWaveSurround;
+                break;
+
+            case 0x4B524D57: // WMRK
+                SgxdWaveMarkerHeader pWaveMarker;
+                break;
+
+            case 0x44514553: // SEQD
+                SgxdSeqHeader pSeq;
+                break;
+
+            case 0x52534441: // ADSR
+                SgxdAdsrHeader pAdsr;
+                break;
+
+            case 0x53535542: // BBUS
+                SgxdBusSetupHeader pBSetup;
+                break;
+
+            case 0x464E4F43: // CONF
+                SgxdTextHeader pText;
+                break;
+  
+            case 0x454E5554: // TUNE
+                SgxdTuningHeader pTuning;
+                break;
+
+            
+            default:
+                done = true;
+                return;
+        }
+
+
+        FSeek(baseChunkDataPos + chunkHeader[i].size);
+        i++;
+
+        if (done)
+           break;
+    }
+} Entry;
+

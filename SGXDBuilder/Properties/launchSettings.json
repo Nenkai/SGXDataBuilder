@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SGXDataBuilder": {
+      "commandName": "Project",
+      "commandLineArgs": "make -i \"D:\\achievement.wav\" -o test"
+    }
+  }
+}
