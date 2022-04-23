@@ -159,12 +159,13 @@ namespace SGXDataBuilder
             {
                 read = audioFs.Read(buffer, 0, Math.Min(buffer.Length, size));
 
+                /* WAV le to be test
                 for (int i = 0; i < read; i += 2)
                 {
                     byte tmp = buffer[i];
                     buffer[i] = buffer[i + 1];
                     buffer[i + 1] = tmp;
-                }
+                } */
 
                 output.Write(buffer, 0, read);
                 size -= read;
