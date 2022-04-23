@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.Buffers.Binary;
+using System.Diagnostics;
 
 using SGXDataBuilder.Utils;
 using SGXDataBuilder.AudioFormats;
@@ -21,6 +22,7 @@ namespace SGXDataBuilder
         public List<IAudioFormat> Files { get; set; } = new();
 
         private SgxdName SgxdName;
+        public string RawPath { get; set; }
 
         private int _currentBodySize;
 
@@ -31,6 +33,7 @@ namespace SGXDataBuilder
             var sgxd = new Sgxd();
             sgxd.SplitBody = splitBody;
             sgxd.SgxdName = sgxd.NameHeader.AddNew(Path.GetFileNameWithoutExtension(sgxdFileName));
+            sgxd.RawPath = sgxdFileName;
 
             Console.WriteLine($"SGXD Name: {sgxd.SgxdName.Name}");
 
@@ -69,9 +72,13 @@ namespace SGXDataBuilder
 
             Console.WriteLine($"Added file: {fileName} ({format})");
 
+            Debug.Assert(WaveHeader.Waves.Count < ushort.MaxValue, $"Too many sound files (> {ushort.MaxValue}.");
+
             uint src = 0;
+            src |= (uint)((WaveHeader.Waves.Count & 0xFFFF) << 24); // Wave Index
+            src |= (uint)(0 << 16); // Seq Index
             src |= ((3 & 0b1111) << 4); // Req type, SgxSndWaveSet
-            src |= (uint)(WaveHeader.Waves.Count << 8); // Request Index Major (wave index)
+            
 
             src = BinaryPrimitives.ReverseEndianness(src);
 
@@ -103,7 +110,10 @@ namespace SGXDataBuilder
         {
             Console.WriteLine("Building Header..");
 
-            using var ms = new FileStream(SgxdName.Name + (SplitBody ? ".sgh" : ".sgd"), FileMode.Create);
+            string fullPath = Path.GetFullPath(this.RawPath);
+            string dir = Path.GetDirectoryName(fullPath);
+
+            using var ms = new FileStream(Path.Combine(dir, SgxdName.Name) + (SplitBody ? ".sgh" : ".sgd"), FileMode.Create);
             using var bs = new BinaryStream(ms);
 
             bs.WriteUInt32(0x44584753); // SGXD
@@ -133,7 +143,7 @@ namespace SGXDataBuilder
 
             if (SplitBody)
             {
-                using var bodyFile = new FileStream(SgxdName.Name + ".sgb", FileMode.Create);
+                using var bodyFile = new FileStream(Path.Combine(dir, SgxdName.Name) + ".sgb", FileMode.Create);
 
                 foreach (var wave in WaveHeader.Waves)
                     CopyAudio(wave.FullPath, bodyFile, wave.BodyOffset, wave.BodySize);

@@ -94,9 +94,8 @@ struct tagSgxdName
 
   struct Src
   {  
-    byte RequestIndexMinor : 8;
-    byte unk : 8;
-    short RequestIndex : 8;
+    short WaveRequestIndex : 16;
+    byte SeqRequestIndex : 8;
     byte Unk : 4;
     SGXRequest RequestType : 4;
   } src
