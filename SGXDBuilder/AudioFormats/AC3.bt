@@ -1,0 +1,159 @@
+//------------------------------------------------
+//--- 010 Editor v12.0.1 Binary Template
+//
+//      File: 
+//   Authors: 
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+BitfieldDisablePadding();
+BigEndian();
+
+const byte AC3_NUM_SAMPLE_RATE_TABLE_ENTRIES = 3;
+const byte AC3_NUM_FRAME_SIZE_TABLE_ENTRIES = 38;
+
+typedef struct rateTable
+{
+    ushort rate[AC3_NUM_SAMPLE_RATE_TABLE_ENTRIES];   
+};
+
+local rateTable fTbl[AC3_NUM_FRAME_SIZE_TABLE_ENTRIES];
+fTbl[0].rate[0] = 64; fTbl[0].rate[1] = 69; fTbl[0].rate[2] = 96;
+fTbl[1].rate[0] = 64; fTbl[1].rate[1] = 70; fTbl[1].rate[2] = 96;
+fTbl[2].rate[0] = 80; fTbl[2].rate[1] = 87; fTbl[2].rate[2] = 120;
+fTbl[3].rate[0] = 80; fTbl[3].rate[1] = 88; fTbl[3].rate[2] = 120;
+fTbl[4].rate[0] = 96; fTbl[4].rate[1] = 104; fTbl[4].rate[2] = 144;
+fTbl[5].rate[0] = 96; fTbl[5].rate[1] = 105; fTbl[5].rate[2] = 144;
+fTbl[6].rate[0] = 112; fTbl[6].rate[1] = 121; fTbl[6].rate[2] = 168;
+fTbl[7].rate[0] = 112; fTbl[7].rate[1] = 122; fTbl[7].rate[2] = 168;
+fTbl[8].rate[0] = 128; fTbl[8].rate[1] = 139; fTbl[8].rate[2] = 192;
+fTbl[9].rate[0] = 128; fTbl[9].rate[1] = 140; fTbl[9].rate[2] = 192;
+fTbl[10].rate[0] = 160; fTbl[10].rate[1] = 174; fTbl[10].rate[2] = 240;
+fTbl[11].rate[0] = 160; fTbl[11].rate[1] = 175; fTbl[11].rate[2] = 240;
+fTbl[12].rate[0] = 192; fTbl[12].rate[1] = 208; fTbl[12].rate[2] = 288;
+fTbl[13].rate[0] = 192; fTbl[13].rate[1] = 209; fTbl[13].rate[2] = 288;
+fTbl[14].rate[0] = 224; fTbl[14].rate[1] = 243; fTbl[14].rate[2] = 336;
+fTbl[15].rate[0] = 224; fTbl[15].rate[1] = 244; fTbl[15].rate[2] = 336;
+fTbl[16].rate[0] = 256; fTbl[16].rate[1] = 278; fTbl[16].rate[2] = 384;
+fTbl[17].rate[0] = 256; fTbl[17].rate[1] = 279; fTbl[17].rate[2] = 384;
+fTbl[18].rate[0] = 320; fTbl[18].rate[1] = 348; fTbl[18].rate[2] = 480;
+fTbl[19].rate[0] = 320; fTbl[19].rate[1] = 349; fTbl[19].rate[2] = 480;
+fTbl[20].rate[0] = 384; fTbl[20].rate[1] = 417; fTbl[20].rate[2] = 576;
+fTbl[21].rate[0] = 384; fTbl[21].rate[1] = 418; fTbl[21].rate[2] = 576;
+fTbl[22].rate[0] = 448; fTbl[22].rate[1] = 487; fTbl[22].rate[2] = 672;
+fTbl[23].rate[0] = 448; fTbl[23].rate[1] = 488; fTbl[23].rate[2] = 672;
+fTbl[24].rate[0] = 512; fTbl[24].rate[1] = 557; fTbl[24].rate[2] = 768;
+fTbl[25].rate[0] = 512; fTbl[25].rate[1] = 558; fTbl[25].rate[2] = 768;
+fTbl[26].rate[0] = 640; fTbl[26].rate[1] = 696; fTbl[26].rate[2] = 960;
+fTbl[27].rate[0] = 640; fTbl[27].rate[1] = 697; fTbl[27].rate[2] = 960;
+fTbl[28].rate[0] = 768; fTbl[28].rate[1] = 835; fTbl[28].rate[2] = 1152;
+fTbl[29].rate[0] = 768; fTbl[29].rate[1] = 836; fTbl[29].rate[2] = 1152;
+fTbl[30].rate[0] = 896; fTbl[30].rate[1] = 975; fTbl[30].rate[2] = 1344;
+fTbl[31].rate[0] = 896; fTbl[31].rate[1] = 976; fTbl[31].rate[2] = 1344;
+fTbl[32].rate[0] = 1024; fTbl[32].rate[1] = 1114; fTbl[32].rate[2] = 1536;
+fTbl[33].rate[0] = 1024; fTbl[33].rate[1] = 1115; fTbl[33].rate[2] = 1536;
+fTbl[34].rate[0] = 1152; fTbl[34].rate[1] = 1253; fTbl[34].rate[2] = 1728;
+fTbl[35].rate[0] = 1152; fTbl[35].rate[1] = 1254; fTbl[35].rate[2] = 1728;
+fTbl[36].rate[0] = 1280; fTbl[36].rate[1] = 1393; fTbl[36].rate[2] = 1920;
+fTbl[37].rate[0] = 1280; fTbl[37].rate[1] = 1394; fTbl[37].rate[2] = 1920;
+
+local ushort sampleRateTable[AC3_NUM_FRAME_SIZE_TABLE_ENTRIES];
+sampleRateTable[0] = 32;
+sampleRateTable[1] = 32;
+sampleRateTable[2] = 40;
+sampleRateTable[3] = 40;
+sampleRateTable[4] = 48;
+sampleRateTable[5] = 48;
+sampleRateTable[6] = 56;
+sampleRateTable[7] = 56;
+sampleRateTable[8] = 64;
+sampleRateTable[9] = 64;
+sampleRateTable[10] = 80;
+sampleRateTable[11] = 80;
+sampleRateTable[12] = 96;
+sampleRateTable[13] = 96;
+sampleRateTable[14] = 112;
+sampleRateTable[15] = 112;
+sampleRateTable[16] = 128;
+sampleRateTable[17] = 128;
+sampleRateTable[18] = 160;
+sampleRateTable[19] = 160;
+sampleRateTable[20] = 192;
+sampleRateTable[21] = 192;
+sampleRateTable[22] = 224;
+sampleRateTable[23] = 224;
+sampleRateTable[24] = 256;
+sampleRateTable[25] = 256;
+sampleRateTable[26] = 320;
+sampleRateTable[27] = 320;
+sampleRateTable[28] = 384;
+sampleRateTable[29] = 384;
+sampleRateTable[30] = 448;
+sampleRateTable[31] = 448;
+sampleRateTable[32] = 512;
+sampleRateTable[33] = 512;
+sampleRateTable[34] = 576;
+sampleRateTable[35] = 576;
+sampleRateTable[36] = 640;
+sampleRateTable[37] = 640;
+
+typedef enum <byte>
+{
+    _48K,
+    _44_1K,
+    _32K,
+    reserved
+} fscod_type;
+
+typedef enum <byte>
+{
+    _2Ch_Ch1_Ch2,
+    _1Ch_C,
+    _2Ch_L_R,
+    _3Ch_L_C_R,
+    _3Ch_L_R_S,
+    _4Ch_L_C_R_S,
+    _4Ch_L_R_SL_SR,
+    _5Ch_L_C_R_SL_SR,
+} AcModAudioCodingMode;
+
+string Printfrmsizcod( byte &r )
+{
+       string s;
+       SPrintf( s, "Bitrate: %dkbps, 16-bit words per syncframe: %d", sampleRateTable[r], fTbl[r].rate[syncinfo.fscod] );
+       return s;
+ }
+
+struct SynchronizationInformation
+{
+    short syncword : 16 <format=hex>;
+    short crc1 : 16 <format=binary>;
+    fscod_type fscod : 2;
+    byte frmsizcod : 6 <format=binary, comment=Printfrmsizcod>;
+} syncinfo;
+
+struct BinaryStreamInformation
+{
+  byte bsid : 5;
+  byte bsmod : 3;
+  AcModAudioCodingMode acmod : 3;
+
+  if ((acmod & 0x01) && (acmod != 0x01))
+    byte cmixlev : 2;
+  
+  if (acmod & 0x04)
+    byte surmixlev : 2;
+
+  if (acmod == 0x02)
+    byte dsurmod : 2;
+
+  byte lfeon : 1;
+  byte dialnorm : 5;
+  byte compre : 1;
+  
+} bsi;
