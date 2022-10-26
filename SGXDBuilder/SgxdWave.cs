@@ -29,12 +29,13 @@ namespace SGXDataBuilder
         public int[] aBody { get; set; } = new int[2];
 
         public int BodyOffset { get; set; }
+        public bool ConvertLeWaveToBe { get; set; } = false;
     }
 
     public enum WaveFormat
     {
         LinearPCM_LE = 0, // WAV Implemented
-        LinearPCM_BE = 1, // Unimplemented, but can reuse wav and flip to BE
+        LinearPCM_BE = 1, // WAV BE Implemented
         OGG_VORBIS = 2, // Or is it?
         PSADPCM = 3, // Unimplemented (Used by GTPSP, GT5/6 sfx)
         ATRAC3plus = 4,

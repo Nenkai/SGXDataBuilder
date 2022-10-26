@@ -40,7 +40,7 @@ namespace SGXDataBuilder
             return sgxd;
         }
 
-        public void AddNewFile(string path)
+        public void AddNewFile(string path, bool convertLEWaveToBE = false)
         {
             InputAudioFormat format;
             using (var fs = new FileStream(path, FileMode.Open))
@@ -60,7 +60,17 @@ namespace SGXDataBuilder
 
                 case InputAudioFormat.WAV:
                     audioFormat = RIFFWav.Read(path);
-                    wave.Format = WaveFormat.LinearPCM_LE;
+                    if ((audioFormat as RIFFWav).BigEndian)
+                        wave.Format = WaveFormat.LinearPCM_BE;
+                    else
+                    {
+                        wave.Format = WaveFormat.LinearPCM_LE;
+                        if (convertLEWaveToBE)
+                        {
+                            wave.Format = WaveFormat.LinearPCM_BE;
+                            wave.ConvertLeWaveToBe = true;
+                        }
+                    }
                     break;
 
                 default:
@@ -106,7 +116,7 @@ namespace SGXDataBuilder
             Console.WriteLine();
         }
 
-        public void Build()
+        public void Build(bool bigEndianWave = false)
         {
             Console.WriteLine("Building Header..");
 
@@ -146,21 +156,21 @@ namespace SGXDataBuilder
                 using var bodyFile = new FileStream(Path.Combine(dir, SgxdName.Name) + ".sgb", FileMode.Create);
 
                 foreach (var wave in WaveHeader.Waves)
-                    CopyAudio(wave.FullPath, bodyFile, wave.BodyOffset, wave.BodySize);
+                    CopyAudio(wave, bodyFile, wave.BodyOffset, wave.BodySize);
             }
             else
             {
                 bs.Position = bodyOffset;
                 foreach (var wave in WaveHeader.Waves)
-                    CopyAudio(wave.FullPath, bs, wave.BodyOffset, wave.BodySize);
+                    CopyAudio(wave, bs, wave.BodyOffset, wave.BodySize);
             }
 
             Console.WriteLine("SGX Audio Bank creation complete.");
         }
 
-        private void CopyAudio(string fileName, Stream output, int beginOffset, int size)
+        private void CopyAudio(SgxdWave wave, Stream output, int beginOffset, int size)
         {
-            using var audioFs = File.OpenRead(fileName);
+            using var audioFs = File.OpenRead(wave.FullPath);
             audioFs.Position = beginOffset;
 
             byte[] buffer = new byte[32768];
@@ -169,13 +179,16 @@ namespace SGXDataBuilder
             {
                 read = audioFs.Read(buffer, 0, Math.Min(buffer.Length, size));
 
-                /* WAV le to be test
-                for (int i = 0; i < read; i += 2)
+                if (wave.Format == WaveFormat.LinearPCM_BE && wave.ConvertLeWaveToBe)
                 {
-                    byte tmp = buffer[i];
-                    buffer[i] = buffer[i + 1];
-                    buffer[i + 1] = tmp;
-                } */
+                    // WAV le to be test
+                    for (int i = 0; i < read; i += 2)
+                    {
+                        byte tmp = buffer[i];
+                        buffer[i] = buffer[i + 1];
+                        buffer[i + 1] = tmp;
+                    }
+                }
 
                 output.Write(buffer, 0, read);
                 size -= read;
