@@ -2,7 +2,7 @@
 
 This tool allows building SGX audio file banks used in various PSP and PS3 games (sgd/sgh/sgb) from standard audio formats (wav/ac3).
 
-This is a format and PS3 library privately created by Sony/SCE used by a few games published by them (listed below) for PSP and PS3 Games.
+This is a format and PSP/PS3 Sound Library privately created by Sony/SCE and used in games published by them (listed below) for PSP and PS3 Games.
 It has been superseded by:
 * `SXD` - PSV-PS4 (Gran Turismo Sport, Gravity Rush, Freedom Wars, Soul Sacrifice)
 * `SZD` - PS4-PS5 (Gran Turismo 7, Astro's Playroom)
