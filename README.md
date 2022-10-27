@@ -20,12 +20,12 @@ It has been superseded by:
 * Ape Escape Move
 * Genji
 * Kurohyo 1/2 [PSP]
-  * SE/Voice: PS-ADPCM, 
-  * BGM: Atrac3PLUS with RIFF header,
+  * SE/Voice: PS-ADPCM
+  * BGM: Atrac3PLUS with RIFF header
   * Extra: gSgxSndWaveStrSet name entry
   * Has WMRK
 * Brave Story - New Traveler [PSP] 
-  * SE/Voice: PS-ADPCM, 
+  * SE/Voice: PS-ADPCM
   * BGM: Atrac3PLUS with RIFF header
   * Extra gSgxSndWaveStrSet name entry
   * Has RGND/SEQD
