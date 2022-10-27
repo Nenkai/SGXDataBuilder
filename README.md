@@ -19,7 +19,7 @@ It has been superseded by:
 * LocoRoco Cocoreccho
 * Ape Escape Move
 * Genji
-* Kurohyo 1/2 
+* Kurohyo 1/2 [PSP] (SE/Voice: PS-ADPCM, Single Banks: Atrac3PLUS with RIFF header, extra gSgxSndWaveStrSet name entry, Has WMRK)
 * Brave Story - New Traveler 
 * Afrika
 * Bleach: Soul Resurrección
