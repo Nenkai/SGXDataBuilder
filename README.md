@@ -16,6 +16,9 @@ It has been superseded by:
 * Gran Turismo 5
 * Gran Turismo 6
 * Gran Turismo PSP
+  * SE: PS-ADPCM
+  * Extra gSgxSndWaveStrSet name entry
+  * Has RGND/SEQD
 * LocoRoco Cocoreccho
 * Ape Escape Move
 * Genji
