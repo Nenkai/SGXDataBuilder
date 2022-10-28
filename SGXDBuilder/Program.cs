@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using SGXDataBuilder.AudioFormats;
+using SGXLib;
 using CommandLine;
 
 
-namespace SGXDataBuilder
+namespace SGXDBuilder.CLI
 {
     public class Program
     {

@@ -12,7 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace SGXDataBuilderGui
+namespace SGXDBuilder.GUI
 {
     /// <summary>
     /// Interaction logic for SoundEntryEditWindow.xaml

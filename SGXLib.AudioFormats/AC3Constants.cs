@@ -1,10 +1,11 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SGXDataBuilder.AudioFormats
+namespace SGXLib.AudioFormats
 {
     public class AC3Constants
     {

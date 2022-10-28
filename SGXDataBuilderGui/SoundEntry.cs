@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
 
-using SGXDataBuilder;
+using SGXLib;
 
-namespace SGXDataBuilderGui
+namespace SGXDBuilder.GUI
 {
     public class SoundEntry : INotifyPropertyChanged
     {

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "VagConvSharp": {
+      "commandName": "Project",
+      "commandLineArgs": "-i \"D:\\Resources\\PSP_SDK_6.60\\usr\\local\\psp\\devkit\\tool\\vagconv\\double_chance.wav\" -n kekw"
+    }
+  }
+}

@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SGXDBuilder\SGXDataBuilder.csproj" />
+    <ProjectReference Include="..\SGXDBuilder\SGXDBuilder.CLI.csproj" />
   </ItemGroup>
 
 </Project>

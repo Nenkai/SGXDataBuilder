@@ -16,10 +16,10 @@ using System.Collections.ObjectModel;
 
 using Microsoft.Win32;
 
-using SGXDataBuilder;
+using SGXLib;
 using System.ComponentModel;
 
-namespace SGXDataBuilderGui
+namespace SGXDBuilder.GUI
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

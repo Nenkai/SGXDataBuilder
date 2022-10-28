@@ -5,11 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Syroot.BinaryData;
-using SGXDataBuilder.Utils;
+using SGXLib.Utils;
 
-namespace SGXDataBuilder.AudioFormats
+namespace SGXLib.AudioFormats
 {
-    internal class Atrac3Plus : IAudioFormat
+    public class Atrac3Plus : IAudioFormat
     {
         public ushort ChannelCount { get; set; }
         public ushort BitsPerSample { get; set; }

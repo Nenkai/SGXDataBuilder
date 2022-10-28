@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using SGXDataBuilder.Utils;
+using SGXLib.Utils;
 
-using static SGXDataBuilder.AudioFormats.AC3Constants;
+using static SGXLib.AudioFormats.AC3Constants;
 
-namespace SGXDataBuilder.AudioFormats
+namespace SGXLib.AudioFormats
 {
     public class AC3 : IAudioFormat
     {
@@ -79,6 +79,6 @@ namespace SGXDataBuilder.AudioFormats
             return kAC3SampleRateTable[syncinfo.fscod];
         }
 
-        
+
     }
 }

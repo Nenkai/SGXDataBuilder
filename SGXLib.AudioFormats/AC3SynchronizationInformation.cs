@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using SGXDataBuilder.Utils;
+using SGXLib.Utils;
 
-namespace SGXDataBuilder.AudioFormats
+namespace SGXLib.AudioFormats
 {
     public class AC3SynchronizationInformation
     {

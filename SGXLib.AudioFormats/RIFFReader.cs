@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 using Syroot.BinaryData;
 
-namespace SGXDataBuilder.AudioFormats
+namespace SGXLib.AudioFormats
 {
-    internal class RIFFFile
+    public class RIFFFile
     {
         public ushort FormatTag { get; set; }
         public ushort ChannelCount { get; set; }
@@ -45,7 +45,7 @@ namespace SGXDataBuilder.AudioFormats
         public static RIFFFile FromStream(Stream stream)
         {
             BinaryStream bs = new BinaryStream(stream);
-            
+
             string magic = bs.ReadString(4);
             if (magic != "RIFF" && magic != "RIFX" && magic != "FFIR")
                 throw new InvalidDataException("Unexpected magic while loading RIFF file.");

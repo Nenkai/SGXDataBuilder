@@ -8,13 +8,13 @@ using System.Buffers.Binary;
 using System.Diagnostics;
 using System.Text.Json;
 
-using SGXDataBuilder.Utils;
-using SGXDataBuilder.AudioFormats;
-using SGXDataBuilder.Project;
+using SGXLib.Utils;
+using SGXLib.Shared.Project;
+using SGXLib.AudioFormats;
 
 using Syroot.BinaryData;
 
-namespace SGXDataBuilder
+namespace SGXLib
 {
     public class Sgxd
     {

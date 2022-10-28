@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using Syroot.BinaryData;
 
-namespace SGXDataBuilder
+namespace SGXLib
 {
     public class SgxdWaveHeader
     {

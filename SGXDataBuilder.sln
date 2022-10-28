@@ -3,9 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32126.317
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SGXDataBuilder", "SGXDBuilder\SGXDataBuilder.csproj", "{EF0BA6BD-076F-42BD-A0D9-FCFBA344DA6F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SGXDBuilder.CLI", "SGXDBuilder\SGXDBuilder.CLI.csproj", "{EF0BA6BD-076F-42BD-A0D9-FCFBA344DA6F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SGXDataBuilderGui", "SGXDataBuilderGui\SGXDataBuilderGui.csproj", "{1B5EDD05-1DCE-4B0C-AF34-5968994674CB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SGXDBuilder.GUI", "SGXDataBuilderGui\SGXDBuilder.GUI.csproj", "{1B5EDD05-1DCE-4B0C-AF34-5968994674CB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VagConvSharp", "VagConvSharp\VagConvSharp.csproj", "{ABAA94E8-C9BA-44E4-AE78-A719C718217A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SGXLib.AudioFormats", "SGXLib.AudioFormats\SGXLib.AudioFormats.csproj", "{2B450159-434E-4C19-B3DB-171C03393F11}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SGXLib", "SGXLib.Shared\SGXLib.csproj", "{ED5BAB9D-1908-4E48-90C2-A0296ADB351A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SGXLib.Utils", "SGXLib.Utils\SGXLib.Utils.csproj", "{FCAE8279-713A-4066-A7B4-1A9D6CED066B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +29,22 @@ Global
 		{1B5EDD05-1DCE-4B0C-AF34-5968994674CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B5EDD05-1DCE-4B0C-AF34-5968994674CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1B5EDD05-1DCE-4B0C-AF34-5968994674CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABAA94E8-C9BA-44E4-AE78-A719C718217A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABAA94E8-C9BA-44E4-AE78-A719C718217A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABAA94E8-C9BA-44E4-AE78-A719C718217A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABAA94E8-C9BA-44E4-AE78-A719C718217A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B450159-434E-4C19-B3DB-171C03393F11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B450159-434E-4C19-B3DB-171C03393F11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B450159-434E-4C19-B3DB-171C03393F11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B450159-434E-4C19-B3DB-171C03393F11}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED5BAB9D-1908-4E48-90C2-A0296ADB351A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED5BAB9D-1908-4E48-90C2-A0296ADB351A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED5BAB9D-1908-4E48-90C2-A0296ADB351A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED5BAB9D-1908-4E48-90C2-A0296ADB351A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCAE8279-713A-4066-A7B4-1A9D6CED066B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCAE8279-713A-4066-A7B4-1A9D6CED066B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCAE8279-713A-4066-A7B4-1A9D6CED066B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCAE8279-713A-4066-A7B4-1A9D6CED066B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

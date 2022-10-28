@@ -6,7 +6,7 @@ using System.IO;
 using System.Buffers.Binary;
 using System.Collections.Generic;
 
-namespace SGXDataBuilder.Utils
+namespace SGXLib.Utils
 {
     /// <summary>
     /// Bit stream reverse engineered & modified with extra features. Big Endian only.
