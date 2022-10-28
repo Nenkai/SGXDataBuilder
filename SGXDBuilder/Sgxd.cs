@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.Buffers.Binary;
 using System.Diagnostics;
+using System.Text.Json;
 
 using SGXDataBuilder.Utils;
 using SGXDataBuilder.AudioFormats;
+using SGXDataBuilder.Project;
 
 using Syroot.BinaryData;
 
@@ -18,33 +20,18 @@ namespace SGXDataBuilder
     {
         public SgxdNameHeader NameHeader { get; set; } = new SgxdNameHeader();
         public SgxdWaveHeader WaveHeader { get; set; } = new SgxdWaveHeader();
+        private SgxdName _thisSgxdName { get; set; }
 
-        public List<IAudioFormat> Files { get; set; } = new();
-
-        private SgxdName SgxdName;
-        public string RawPath { get; set; }
-
+        public List<IAudioFormat> _files { get; set; } = new();
         private int _currentBodySize;
-
         public bool SplitBody { get; set; }
+        public string Label { get; set; }
 
-        public static Sgxd Create(string sgxdFileName, bool splitBody = false)
-        {
-            var sgxd = new Sgxd();
-            sgxd.SplitBody = splitBody;
-            sgxd.SgxdName = sgxd.NameHeader.AddNew(Path.GetFileNameWithoutExtension(sgxdFileName));
-            sgxd.RawPath = sgxdFileName;
-
-            Console.WriteLine($"SGXD Name: {sgxd.SgxdName.Name}");
-
-            return sgxd;
-        }
-
-        public void AddNewFile(string path, bool convertLEWaveToBE = false)
+        public SgxdWave AddNewFile(string path, string waveName, bool convertLEWaveToBE = false)
         {
             InputAudioFormat format;
             using (var fs = new FileStream(path, FileMode.Open))
-                format = DetectFormat(fs);
+                format = DetectFormat(Path.GetExtension(path), fs);
 
             IAudioFormat audioFormat;
             var wave = new SgxdWave();
@@ -53,21 +40,28 @@ namespace SGXDataBuilder
             {
                 case InputAudioFormat.AC3:
                     audioFormat = AC3.Read(path);
-                    wave.Format = WaveFormat.AC3;
-                    wave.BitRate_Par0 = audioFormat.GetBitRate();
-                    wave.BitRate_Par1 = audioFormat.GetFrameSize();
+                    wave.Format = SgxDataFormat.AC3;
+                    wave.BitRate_Par0 = audioFormat.GetBitRate_ForPar0();
+                    wave.BitRate_Par1 = audioFormat.GetFrameSize_ForPar1();
+                    break;
+
+                case InputAudioFormat.Atrac3Plus:
+                    audioFormat = Atrac3Plus.Read(path);
+                    wave.Format = SgxDataFormat.ATRAC3plus;
+                    wave.BitRate_Par0 = audioFormat.GetBitRate_ForPar0();
+                    wave.BitRate_Par1 = audioFormat.GetFrameSize_ForPar1();
                     break;
 
                 case InputAudioFormat.WAV:
-                    audioFormat = RIFFWav.Read(path);
-                    if ((audioFormat as RIFFWav).BigEndian)
-                        wave.Format = WaveFormat.LinearPCM_BE;
+                    audioFormat = Waveform.Read(path);
+                    if ((audioFormat as Waveform).BigEndian)
+                        wave.Format = SgxDataFormat.LinearPCM_BE;
                     else
                     {
-                        wave.Format = WaveFormat.LinearPCM_LE;
+                        wave.Format = SgxDataFormat.LinearPCM_LE;
                         if (convertLEWaveToBE)
                         {
-                            wave.Format = WaveFormat.LinearPCM_BE;
+                            wave.Format = SgxDataFormat.LinearPCM_BE;
                             wave.ConvertLeWaveToBe = true;
                         }
                     }
@@ -78,60 +72,69 @@ namespace SGXDataBuilder
                     
             }
 
-            string fileName = Path.GetFileNameWithoutExtension(path);
-
-            Console.WriteLine($"Added file: {fileName} ({format})");
-
             Debug.Assert(WaveHeader.Waves.Count < ushort.MaxValue, $"Too many sound files (> {ushort.MaxValue}.");
 
-            uint src = 0;
-            src |= (uint)((WaveHeader.Waves.Count & 0xFFFF) << 24); // Wave Index
-            src |= (uint)(0 << 16); // Seq Index
-            src |= ((3 & 0b1111) << 4); // Req type, SgxSndWaveSet
-            
+            string fileName = Path.GetFileNameWithoutExtension(path);
+            Console.WriteLine($"Added file: {fileName} ({format})");
 
-            src = BinaryPrimitives.ReverseEndianness(src);
-
+            wave.FullFileSize = audioFormat.GetFullFileSize();
             wave.BodyOffset = audioFormat.GetBodyOffset();
-            wave.FullPath = path;
-
-            wave.Frequence = audioFormat.GetSampleRate_Frequence();
-            Console.WriteLine($"- Frequence: {wave.Frequence}Hz");
-
-            wave.Channels = audioFormat.GetChannelCount();
-            Console.WriteLine($"- Channels: {wave.Channels}");
-
             wave.BodySize = audioFormat.GetBodySize();
-            wave.Name = NameHeader.AddNew(Path.GetFileNameWithoutExtension(path), src);
-
+            wave.FullPath = path;
+            wave.Frequence = audioFormat.GetSampleRate_Frequence();
+            wave.Channels = audioFormat.GetChannelCount();
+            wave.BodySize = audioFormat.GetBodySize();
+            wave.Name = NameHeader.AddNew(waveName, SGXRequest.gSgxSndWaveSet, (ushort)WaveHeader.Waves.Count, 0);
             wave.WEnd = audioFormat.GetTotalSampleCount();
+
+            Console.WriteLine($"- Frequence: {wave.Frequence}Hz");
+            Console.WriteLine($"- Channels: {wave.Channels}");
             Console.WriteLine($"- Sample Count: {wave.WEnd}");
 
             wave.aBody[0] = _currentBodySize;
-            wave.aBody[1] = _currentBodySize + wave.BodySize;
-            _currentBodySize += wave.BodySize;
+            wave.aBody[1] = _currentBodySize + wave.FullFileSize;
+            _currentBodySize += wave.FullFileSize;
 
             WaveHeader.Waves.Add(wave);
 
             Console.WriteLine();
+
+            return wave;
         }
 
-        public void Build(bool bigEndianWave = false)
+        public void RemoveWave(SgxdWave wave)
         {
+            WaveHeader.Waves.Remove(wave);
+            NameHeader.Names.Remove(wave.Name);
+        }
+
+        public void Build(string path)
+        {
+            path = Path.GetFullPath(path);
+            string pathWithoutExtension = path.Substring(0, path.LastIndexOf(".")); // Not using GetPathWithoutExtension as D:\\something.txt gets converted to just "something"
+
+            // Add the WaveStrSet based on name
+            if (_thisSgxdName is null)
+            {
+                _thisSgxdName = NameHeader.AddNew(!string.IsNullOrEmpty(Label) ? Label : Path.GetFileNameWithoutExtension(pathWithoutExtension),
+                    SGXRequest.gSgxSndWaveStrSet, // Important
+                    0, 0);
+                _thisSgxdName.WaveNamePointerOffset = 0x04; // It's just after the magic
+            }
+
             Console.WriteLine("Building Header..");
+            WriteFileHeader(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(pathWithoutExtension));
+            Console.WriteLine("SGX Audio Bank creation complete.");
+        }
 
-            string fullPath = Path.GetFullPath(this.RawPath);
-            string dir = Path.GetDirectoryName(fullPath);
-
-            using var ms = new FileStream(Path.Combine(dir, SgxdName.Name) + (SplitBody ? ".sgh" : ".sgd"), FileMode.Create);
+        private void WriteFileHeader(string outputDir, string fileNameWithoutExtension)
+        {
+            string outputPath = Path.Combine(outputDir, fileNameWithoutExtension);
+            using var ms = new FileStream(outputPath + (SplitBody ? ".sgh" : ".sgd"), FileMode.Create);
             using var bs = new BinaryStream(ms);
 
-            bs.WriteUInt32(0x44584753); // SGXD
-            SgxdName.NamePointerOffset = (int)bs.Position;
-
-            bs.WriteUInt32(0); // SGXD Name - write later
-            bs.WriteUInt32(0); // Header Size - write later
-            bs.WriteUInt32(0); // Body size - write later
+            // Skip header and write ToC for now
+            bs.Position += 0x10;
 
             WaveHeader.Build(this, bs);
             NameHeader.Build(this, bs);
@@ -139,9 +142,11 @@ namespace SGXDataBuilder
             int bodyOffset = (int)bs.Position;
             int headerSize = bodyOffset;
 
-            bs.Position = 0x08;
-            bs.WriteInt32(headerSize);
-
+            // Done, write header
+            bs.Position = 0;
+            bs.WriteUInt32(0x44584753); // SGXD
+            bs.Position += 4; // SGXD Name - Already rewritten
+            bs.WriteUInt32((uint)headerSize);
             int bodySizeBits = _currentBodySize;
             if (!SplitBody)
             {
@@ -151,21 +156,20 @@ namespace SGXDataBuilder
 
             bs.WriteInt32(bodySizeBits);
 
+            // Now write contents
             if (SplitBody)
             {
-                using var bodyFile = new FileStream(Path.Combine(dir, SgxdName.Name) + ".sgb", FileMode.Create);
+                using var bodyFile = new FileStream(outputPath + ".sgb", FileMode.Create);
 
                 foreach (var wave in WaveHeader.Waves)
-                    CopyAudio(wave, bodyFile, wave.BodyOffset, wave.BodySize);
+                    CopyAudio(wave, bodyFile, wave.BodyOffset, wave.FullFileSize);
             }
             else
             {
                 bs.Position = bodyOffset;
                 foreach (var wave in WaveHeader.Waves)
-                    CopyAudio(wave, bs, wave.BodyOffset, wave.BodySize);
+                    CopyAudio(wave, bs, wave.BodyOffset, wave.FullFileSize);
             }
-
-            Console.WriteLine("SGX Audio Bank creation complete.");
         }
 
         private void CopyAudio(SgxdWave wave, Stream output, int beginOffset, int size)
@@ -179,7 +183,7 @@ namespace SGXDataBuilder
             {
                 read = audioFs.Read(buffer, 0, Math.Min(buffer.Length, size));
 
-                if (wave.Format == WaveFormat.LinearPCM_BE && wave.ConvertLeWaveToBe)
+                if (wave.Format == SgxDataFormat.LinearPCM_BE && wave.ConvertLeWaveToBe)
                 {
                     // WAV le to be test
                     for (int i = 0; i < read; i += 2)
@@ -195,7 +199,7 @@ namespace SGXDataBuilder
             }
         }
 
-        private InputAudioFormat DetectFormat(Stream stream)
+        private InputAudioFormat DetectFormat(string extension, Stream stream)
         {
             byte[] magic = new byte[4];
             stream.Read(magic);
@@ -204,11 +208,85 @@ namespace SGXDataBuilder
 
             InputAudioFormat format = InputAudioFormat.Unknown;
             if ((magicVal & 0x0000FFFF) == 0x770B)
+            {
                 format = InputAudioFormat.AC3;
-            else if (magicVal == 0x46464952)
-                format = InputAudioFormat.WAV;
+            }
+            else if (magicVal == 0x46464952) // RIFF container
+            {
+                stream.Position = 0;
+
+                if (extension.Equals(".at3", StringComparison.OrdinalIgnoreCase))
+                    format = InputAudioFormat.Atrac3Plus;
+                else if (extension.Equals(".wav", StringComparison.OrdinalIgnoreCase))
+                    format = InputAudioFormat.WAV;
+                else
+                    return InputAudioFormat.Unknown;
+            }
+                
 
             return format;
+        }
+
+        public void Reset()
+        {
+            _thisSgxdName = null;
+            _currentBodySize = 0;
+            SplitBody = false;
+            _files.Clear();
+
+            NameHeader.Clear();
+            WaveHeader.Clear();
+        }
+
+        public void ImportFromProject(string fileName)
+        {
+            Reset();
+
+            if (!File.Exists(fileName))
+                throw new FileNotFoundException($"Project file {fileName} does not exist.");
+
+            string json = File.ReadAllText(fileName);
+            SgxdProject project = JsonSerializer.Deserialize<SgxdProject>(json);
+
+            if (project is null)
+                return;
+
+            SplitBody = project.SplitBody;
+
+            foreach (SgxdProjectSoundEntry entry in project.SgxdProjectSoundEntries)
+            {
+                if (!File.Exists(entry.Path))
+                    throw new FileNotFoundException($"File '{entry.Path}' does not exist in project file.");
+
+                AddNewFile(entry.Path, entry.Name);
+            }
+
+            Label = project.Label;
+        }
+
+        public void ExportAsProject(string fileName)
+        {
+            var project = new SgxdProject();
+
+            project.Label = Label;
+            project.SplitBody = SplitBody;
+
+            foreach (var entry in WaveHeader.Waves)
+            {
+                project.SgxdProjectSoundEntries.Add(new SgxdProjectSoundEntry()
+                {
+                    Name = entry.Name.Name,
+                    Path = entry.FullPath,
+                    SampleStart = entry.LBeg,
+                    SampleEnd = entry.LEnd
+                });
+            }
+
+            string json = JsonSerializer.Serialize(project, new JsonSerializerOptions()
+            {
+                WriteIndented = true,
+            });
+            File.WriteAllText(fileName, json);
         }
 
         enum InputAudioFormat
@@ -216,6 +294,7 @@ namespace SGXDataBuilder
             Unknown,
             AC3,
             WAV,
+            Atrac3Plus
         }
     }
 }

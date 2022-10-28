@@ -9,10 +9,11 @@ namespace SGXDataBuilder
     public class SgxdWave
     {
         public string FullPath { get; set; }
+        public int FullFileSize { get; set; }
 
         public int Flags { get; set; }
         public SgxdName Name { get; set; }
-        public WaveFormat Format { get; set; }
+        public SgxDataFormat Format { get; set; }
         public byte Channels { get; set; }
         public byte NumberOfLoops { get; set; }
         //resv
@@ -30,9 +31,14 @@ namespace SGXDataBuilder
 
         public int BodyOffset { get; set; }
         public bool ConvertLeWaveToBe { get; set; } = false;
+
+        public TimeSpan GetLength()
+        {
+            return TimeSpan.FromSeconds(WEnd / Frequence);
+        }
     }
 
-    public enum WaveFormat
+    public enum SgxDataFormat
     {
         LinearPCM_LE = 0, // WAV Implemented
         LinearPCM_BE = 1, // WAV BE Implemented

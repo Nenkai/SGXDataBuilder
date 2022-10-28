@@ -25,7 +25,7 @@ namespace SGXDataBuilder
             foreach (var wave in Waves)
             {
                 bs.WriteInt32(wave.Flags);
-                wave.Name.NamePointerOffset = (int)bs.Position; bs.Position += 4;
+                wave.Name.WaveNamePointerOffset = (int)bs.Position; bs.Position += 4;
                 bs.WriteByte((byte)wave.Format);
                 bs.WriteByte(wave.Channels);
                 bs.WriteByte(wave.NumberOfLoops);
@@ -50,6 +50,12 @@ namespace SGXDataBuilder
             bs.Position = chunkStartOffset + 4;
             bs.WriteInt32(chunkEndOffset - (chunkStartOffset + 8));
             bs.Position = chunkEndOffset;
+        }
+
+        public void Clear()
+        {
+            Flags = 0;
+            Waves.Clear();
         }
     }
 }

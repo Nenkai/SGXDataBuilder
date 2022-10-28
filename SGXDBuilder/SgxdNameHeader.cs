@@ -13,13 +13,11 @@ namespace SGXDataBuilder
         public int Flags { get; set; }
 
         // Sorted for BSearch (required)
-        public List<SgxdName> Names { get; set; } = new List<SgxdName>();
+        public SortedSet<SgxdName> Names { get; set; } = new SortedSet<SgxdName>(SgxdNameComparer.Default);
 
         public void Build(Sgxd parent, BinaryStream bs)
         {
             // Order for bsearch (important, player wants them ordered)
-            Names.Sort(SgxdNameComparer.Default);
-
             int chunkStartOffset = (int)bs.Position;
             bs.WriteUInt32(0x454D414E); // NAME
             bs.WriteUInt32(0); // Chunk Length - Write later
@@ -30,24 +28,26 @@ namespace SGXDataBuilder
             int tocStartOffset = (int)bs.Position;
             int lastNameOffset = tocStartOffset + (Names.Count * 8);
 
-            for (int i = 0; i < Names.Count; i++)
+            int i = 0;
+            foreach (var name in Names)
             {
                 bs.Position = tocStartOffset + (i * 8);
-                bs.WriteUInt32(Names[i].Source);
+                bs.WriteUInt32(name.GetSourceBits());
                 bs.WriteInt32(lastNameOffset);
 
                 bs.Position = lastNameOffset;
                 int strOffset = (int)bs.Position;
-                bs.WriteString(Names[i].Name, StringCoding.ZeroTerminated);
+                bs.WriteString(name.Name, StringCoding.ZeroTerminated);
                 lastNameOffset = (int)bs.Position;
 
-                // Update reference pointer
-                bs.Position = Names[i].NamePointerOffset;
+                // Update reference pointer in WAVE if possible
+                bs.Position = name.WaveNamePointerOffset;
                 bs.WriteInt32(strOffset);
 
-                bs.Position = lastNameOffset;
+                i++;
             }
 
+            bs.Position = lastNameOffset;
             bs.Align(0x10, grow: true);
 
             int chunkEndOffset = (int)bs.Position;
@@ -56,11 +56,18 @@ namespace SGXDataBuilder
             bs.Position = chunkEndOffset;
         }
 
-        public SgxdName AddNew(string name, uint srcFlags = 0)
+        public void Clear()
         {
+            Flags = 0;
+            Names.Clear();
+        }
 
+        public SgxdName AddNew(string name, SGXRequest reqType, ushort waveRequestIndex, byte seqRequestIndex)
+        {
             var sgxName = new SgxdName(name);
-            sgxName.Source = srcFlags;
+            sgxName.RequestType = reqType;
+            sgxName.WaveIndex = waveRequestIndex;
+            sgxName.SeqIndex = seqRequestIndex;
             Names.Add(sgxName);
 
             return sgxName;

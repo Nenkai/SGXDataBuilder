@@ -1,0 +1,65 @@
+﻿<Window x:Class="SGXDataBuilderGui.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SGXDataBuilderGui"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        mc:Ignorable="d"
+        Title="SGXD Builder" Height="450" Width="700"
+        AllowDrop="True" 
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        Drop="Window_Drop">
+    <Grid>
+        <DockPanel>
+            <Menu DockPanel.Dock="Top" Height="20">
+                <MenuItem Header="File">
+                    <MenuItem Header="_Load Project" Name="MenuItem_LoadProject" Click="MenuItem_LoadProject_Click"/>
+                    <MenuItem Header="_Save Project" Name="MenuItem_SaveProject" Click="MenuItem_SaveProject_Click" IsEnabled="False"/>
+                    <Separator/>
+                    <MenuItem Header="_Import Audio Source" Click="MenuItem_ImportSource_Click"/>
+                    <MenuItem Header="_Export to SGD" Name="MenuItem_ExportSGD" Click="MenuItem_ExportSGD_Click"/>
+                    <Separator/>
+                    <MenuItem Header="_Exit"/>
+                </MenuItem>
+            </Menu>
+            <Grid DockPanel.Dock="Bottom">
+                <TabControl>
+                    <TabItem Header="Main">
+                        <ListView Name="lv_Sounds" ItemsSource="{Binding Entries}" MouseDoubleClick="lv_Sounds_MouseDoubleClick">
+                            <ListView.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Name="mi_RemoveSound" Header="Remove" Click="mi_RemoveSound_Click"/>
+                                </ContextMenu>
+                            </ListView.ContextMenu>
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Header="Name" Width="150" DisplayMemberBinding="{Binding Name}"/>
+                                    <GridViewColumn Header="Format" Width="80" DisplayMemberBinding="{Binding SGXDWave.Format}"/>
+                                    <GridViewColumn Header="Length" Width="80" DisplayMemberBinding="{Binding Length}"/>
+                                    <GridViewColumn Header="Frequence" Width="65"  DisplayMemberBinding="{Binding SGXDWave.Frequence}"/>
+                                    <GridViewColumn Header="Total Samples" Width="80"  DisplayMemberBinding="{Binding SGXDWave.WEnd}"/>
+                                    <GridViewColumn Header="Sample Loop Start" Width="105"  DisplayMemberBinding="{Binding SGXDWave.LBeg}"/>
+                                    <GridViewColumn Header="Sample Loop End" Width="100"  DisplayMemberBinding="{Binding SGXDWave.LEnd}"/>
+                                    <GridViewColumn Header="Path" Width="600" DisplayMemberBinding="{Binding Path}" />
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </TabItem>
+                    <TabItem Header="SGXD Settings">
+                        <Grid>
+                            <DockPanel Height="25" Margin="10,10,10,0" VerticalAlignment="Top">
+                                <Label DockPanel.Dock="Left" Content="Main SGX Settings"/>
+                                <Separator/>
+                            </DockPanel>
+                            <CheckBox Content="Split SGD into .sgh header file and .sgb bank file" Margin="22,42,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="307" IsChecked="{Binding SplitBody}"/>
+
+                            <Label Content="SGD Label (empty = export file name)" Margin="17,66,0,0" Height="34" VerticalAlignment="Top" HorizontalAlignment="Left" Width="674"/>
+                            <TextBox Margin="237,70,10,0" Height="24" VerticalAlignment="Top" Text="{Binding Label, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Grid>
+                    </TabItem>
+                </TabControl>
+            </Grid>
+        </DockPanel>
+    </Grid>
+</Window>
