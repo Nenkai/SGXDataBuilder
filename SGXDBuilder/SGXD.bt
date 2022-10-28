@@ -2,19 +2,33 @@
 //--- 010 Editor v10.0.2 Binary Template
 //
 //      File: Gran Turismo 5/6 SGXD
-//   Authors: Xenn
+//   Authors: Nenkai#9075, Xenn
 //   Version: 
 //   Purpose: Music Files
 //  Category: 
-// File Mask: 
-//  ID Bytes: 
+// File Mask: *.sgd,*.sgh
+//  ID Bytes: 53 47 58 44
 //   History: 
 //------------------------------------------------
+
+// The file is always LE.
 LittleEndian();
 
 // Information taken from debug symbols, Folklore PS3
 
+string PrintNameFromOffset(int& i)
+{
+    if (i == 0)
+        return "(unnamed)";
+
+    return "Name: " + ReadString(i);
+}
+
 local int curPos;
+
+////////////////////////////////////
+///////////////////// Main typedefs
+////////////////////////////////////
 
 typedef uint sguint32;
 typedef int sgint32;
@@ -22,12 +36,22 @@ typedef short sgint16;
 typedef byte sgint8;
 typedef ubyte sguint8;
 
+// Similar if not inspired from RIFF chunks
 struct tagSgxdChunkHeader
 {
-  sguint32 ident <format=hex, fgcolor=cPurple>;
+  union
+  {
+    sguint32 ident <format=hex, fgcolor=cPurple>;
+    char identStr[4];
+  } ident;
   sgint32 size <format=hex, fgcolor=cGreen>;
 };
-typedef tagSgxdChunkHeader SgxdChunkHeader;
+typedef tagSgxdChunkHeader SgxdChunkHeader <comment=PrintChunkName>;
+
+string PrintChunkName(SgxdChunkHeader& header)
+{
+    return header.ident.identStr;
+}
 
 typedef enum <byte> SGXRequest
 {
@@ -41,11 +65,13 @@ typedef enum <byte> SGXRequest
    SgxConfCall = 6,
 } SGXRequest;
 
+////////////////////////////////
 ///////////////////// Note - RGN
+////////////////////////////////
 struct tagSgxdRgn
 {
   sgint32 flags;
-  sgint32 name;
+  sgint32 name <format=hex, fgcolor=cRed, comment=PrintNameFromOffset>;
   sgint32 ssize;
   sgint8 prior;
   sguint8 gpid;
@@ -71,22 +97,33 @@ struct tagSgxdRgn
   sgint8 bendH;
   sgint32 wave;
 };
-typedef tagSgxdRgn SgxdRgn;
+typedef tagSgxdRgn SgxdRgn <comment=PrintRgn>;
+
+string PrintRgn(SgxdRgn& rgn)
+{
+    if (rgn.name == 0)
+        return "(unnamed)";
+
+    return "Name: " + ReadString(rgn.name);
+}
 
 struct tagSgxdRgnHeader
 {
   sgint32 flags;
-  sgint32 nrgn;
+  sgint32 nrgn <fgcolor=cGreen>;
   
   struct
   {
-    SgxdRgn aRgn[2] <format=hex>;
-  } arr[nrgn];
+    int count <fgcolor=cGreen>;
+    int off <format=hex, fgcolor=cRed>;
+    SgxdRgn aRgn[count] <format=hex>;
+  } arr[nrgn] <optimize=false>;
 };
 typedef tagSgxdRgnHeader SgxdRgnHeader;
 
-
+////////////////////////////
 //////////////// Name - NAME
+////////////////////////////
 struct tagSgxdName
 {
   
@@ -98,12 +135,16 @@ struct tagSgxdName
     byte SeqRequestIndex : 8;
     byte Unk : 4;
     SGXRequest RequestType : 4;
-  } src
-;
+  } src;
 
-  sgint32 name <format=hex, fgcolor=cRed, comment="Offset to name">;
+  sgint32 name <format=hex, fgcolor=cRed, comment=PrintNameFromOffset>;
 };
-typedef tagSgxdName SgxdName <optimize=false>;
+typedef tagSgxdName SgxdName <optimize=false, comment=PrintSgxdName>;
+
+string PrintSgxdName(SgxdName& name)
+{
+    return ReadString(name.name) + " (" + EnumToString(name.src.RequestType) + ")";
+}
 
 struct tagSgxdNameHeader
 {
@@ -113,11 +154,13 @@ struct tagSgxdNameHeader
 };
 typedef tagSgxdNameHeader SgxdNameHeader;
 
+///////////////////////////
 /////////////// Wave - WAVE
+///////////////////////////
 struct tagSgxdWave
 {
   sgint32 flags;
-  sgint32 name <format=hex, fgcolor=cRed, comment="Offset to name of wave">;
+  sgint32 name <format=hex, fgcolor=cRed, comment=PrintNameFromOffset>;
   enum <sgint8>  
   {
     // sgxFormSampleToByte(sgint32 form, sgint32 ch, sgint32 par0, sgint32 par1, sgbool isBeg, sgint32 smpl)
@@ -161,24 +204,38 @@ struct tagSgxdWave
   sgint32 lbeg <comment="Loop Begin Sample - Make this the starting point of the loop from Awave">;
   sgint32 lend <comment="Loop End Sample - Make this the sample size of the audio">;
   sgint32 bsize <format=hex, comment="ChannelDataSize">;
-  sgint32 aBody[2] <format=hex>;
+  sgint32 aBody[2] <format=hex, comment="Start and End Data Offsets">;
+
+  if (name == 0)
+    Printf("Wave Entry: (unnamed) (" + EnumToString(form) + ")\n");
+  else
+    Printf("Wave Entry: %s", ReadString(name) + " (" + EnumToString(form) + ")\n");
 };
-typedef tagSgxdWave SgxdWave;
+typedef tagSgxdWave SgxdWave <comment=PrintWave>;
+
+string PrintWave(SgxdWave& wave)
+{
+    if (wave.name == 0)
+        return "(unnamed)" + " (" + EnumToString(wave.form) + ")";
+
+    return ReadString(wave.name) + " (" + EnumToString(wave.form) + ")";
+}
 
 struct tagSgxdWaveHeader
 {
   sgint32 flags;
   sgint32 nwave <fgcolor=cGreen>;
-  SgxdWave aWave[nwave];
+  SgxdWave aWave[nwave] <optimize=false>;
 };
 typedef tagSgxdWaveHeader SgxdWaveHeader;
 
+//////////////////////////
 ////////// Sequence - SEQD
-
+//////////////////////////
 struct tagSgxdSeq
 {
   sgint32 flags;
-  sgint32 name <format=hex, fgcolor=cRed, comment="Offset to name of sequence">;
+  sgint32 name <format=hex, fgcolor=cRed, comment=PrintNameFromOffset>;
   sgint16 form <comment="Format of sequence">;
   sgint16 reso;
   sgint16 volL <format=hex, comment="Volume Left">;
@@ -186,8 +243,12 @@ struct tagSgxdSeq
   sgint32 size <format=hex, comment="Command Buffer Size">;
   sguint8 data[size] <comment="Command Buffer">;
 };
-typedef tagSgxdSeq SgxdSeq;
+typedef tagSgxdSeq SgxdSeq <comment=PrintSgxdSeq>;
 
+string PrintSgxdSeq(SgxdSeq& seq)
+{
+    return ReadString(seq.name);
+}
 struct tagSgxdSeqGrp
 {
   sgint32 flags;
@@ -224,12 +285,14 @@ struct tagSgxdSeqHeader
 };
 typedef tagSgxdSeqHeader SgxdSeqHeader;
 
+//////////////////////////////////////
 //////////////// Bus Param/Text - CONF
+//////////////////////////////////////
 struct tagSgxdText
 {
   sgint32 flags;
-  sgint32 name;
-  sgint32 ofs;
+  sgint32 name <format=hex, fgcolor=cRed, comment=PrintNameFromOffset>;
+  sgint32 ofs <format=hex, fgcolor=cRed, comment=PrintNameFromOffset>;
 };
 typedef tagSgxdText SgxdText;
 
@@ -241,7 +304,9 @@ struct tagSgxdTextHeader
 };
 typedef tagSgxdTextHeader SgxdTextHeader;
 
+/////////////////////////////////////////
 /////////////////////////// Tuning - TUNE
+/////////////////////////////////////////
 struct tagSgxdTuning
 {
   sgint32 flags;
@@ -263,7 +328,9 @@ struct tagSgxdTuningHeader
 };
 typedef tagSgxdTuningHeader SgxdTuningHeader;
 
+//////////////////////////////////////////////
 ////////////////////////// WaveSurround - WSUR
+//////////////////////////////////////////////
 struct tagSgxdWaveSurround
 {
   sgint8 flags;
@@ -285,7 +352,9 @@ struct tagSgxdWaveSurroundHeader
 };
 typedef tagSgxdWaveSurroundHeader SgxdWaveSurroundHeader;
 
+/////////////////////////////////////////////
 /////////////////////////// WaveMarker - WMRK
+/////////////////////////////////////////////
 struct tagSgxdWaveMarker
 {
   sgint32 name;
@@ -305,7 +374,9 @@ struct tagSgxdWaveMarkerHeader
 };
 typedef tagSgxdWaveMarkerHeader SgxdWaveMarkerHeader;
 
+///////////////////////////////
 ////////////////////////// ASDR
+///////////////////////////////
 struct tagSgxdAdsrHeader
 {
   sgint32 flags;
@@ -314,12 +385,14 @@ struct tagSgxdAdsrHeader
 };
 typedef tagSgxdAdsrHeader SgxdAdsrHeader;
 
+//////////////////////////////////////////
 ///////////////////////// Bus Setup - BUSS
+//////////////////////////////////////////
 struct tagSgxdBusEffect
 {
   sgint32 flags;
-  sgint32 name;
-  sgint32 module;
+  sgint32 name <format=hex, fgcolor=cRed, comment=PrintNameFromOffset>;
+  sgint32 module <format=hex, fgcolor=cRed, comment=PrintNameFromOffset>;
   sgint8 aCAssign[8];
   sgint8 nibus;
   sgint8 nobus;
@@ -328,30 +401,53 @@ struct tagSgxdBusEffect
   sgint8 aOBus[4];
   sgint16 aIGain[4];
   sgint16 aOGain[4];
-  sgint32 pbody;
+  sgint32 pbody <format=hex, fgcolor=cRed>;
   sgint32 resv1;
   sgint32 resv2;
   sgint32 resv3;
 };
 typedef tagSgxdBusEffect SgxdBusEffect;
 
+struct tagSgxdBusUnit
+{
+  sgint32 flags;
+  sgint32 name <format=hex, fgcolor=cRed, comment=PrintNameFromOffset>;
+  sgint32 resv0;
+  sgint32 resv1;
+};
+typedef tagSgxdBusUnit SgxdBusUnit;
+
 struct tagSgxdBusSetup
 {
   sgint32 flags;
-  sgint32 name;
-  sgint8 nunit;
-  sgint8 neffect;
+  sgint32 name <format=hex, fgcolor=cRed, comment=PrintNameFromOffset>;
+  sgint8 nunit <fgcolor=cGreen>;
+  sgint8 neffect <fgcolor=cGreen>;
   sgint8 munit;
   sgint8 resv0;
   sgint32 resv1;
-  sgint32 aUnit;
-  sgint32 aEffect;
-  sgint32 oper;
-  sgint32 oparam;
+  sgint32 aUnit <format=hex, fgcolor=cRed>;
+  sgint32 aEffect <format=hex, fgcolor=cRed>;
+  sgint32 oper <format=hex, fgcolor=cRed>;
+  sgint32 oparam <format=hex, fgcolor=cRed>;
   sgint32 resv2;
   sgint32 resv3;
   sgint32 resv4;
   sgint32 resv5;
+
+  local int cPos = FTell();
+  if (nunit > 0)
+  {
+    FSeek(aUnit);
+    SgxdBusUnit units[nunit] <optimize=false>;
+  }
+
+  if (neffect > 0)
+  {
+    FSeek(aEffect);
+    SgxdBusEffect effects[neffect] <optimize=false>;
+  }
+  FSeek(cPos);
 };
 typedef tagSgxdBusSetup SgxdBusSetup;
 
@@ -359,24 +455,17 @@ struct tagSgxdBusSetupHeader
 {
   sgint32 flags;
   sgint32 nsetup;
-  SgxdBusSetup aSetup[nsetup];
+  SgxdBusSetup aSetup[nsetup] <optimize=false>;
 };
 typedef tagSgxdBusSetupHeader SgxdBusSetupHeader;
 
-struct tagSgxdBusUnit
-{
-  sgint32 flags;
-  sgint32 name;
-  sgint32 resv0;
-  sgint32 resv1;
-};
-typedef tagSgxdBusUnit SgxdBusUnit;
-
+//////////////////////////////////////
 ////////////////////////// MAIN HEADER
+//////////////////////////////////////
 struct tagSgxdFileHeader
 {
   sguint32 SGXD <format=hex, comment="Magic">;
-  sgint32 name <format=hex, fgcolor=cRed, comment="Actual SGXD file name offset">;
+  sgint32 name <format=hex, fgcolor=cRed, comment=PrintNameFromOffset>;
   sgint32 hsize <format=hex, comment="Header Size">;
   sgint32 bsize <format=hex, comment="Body Size, 1 bit unk, 31 bit size">;
 };
@@ -386,6 +475,7 @@ typedef tagSgxdFileHeader SgxdFileHeader;
 struct SGXD
 {
     SgxdFileHeader header;
+    Printf("SGXD Name: %s\n", ReadString(header.name));
 
     local int i = 0;
     local int baseChunkDataPos;
@@ -396,7 +486,7 @@ struct SGXD
         SgxdChunkHeader chunkHeader;
         baseChunkDataPos = FTell();
 
-        switch (chunkHeader[i].ident)
+        switch (chunkHeader[i].ident.ident)
         {
             case 0x454D414E: // NAME
                 SgxdNameHeader pName;
@@ -452,4 +542,3 @@ struct SGXD
            break;
     }
 } Entry;
-
