@@ -111,7 +111,10 @@ namespace SGXDBuilder.GUI
         {
             OpenFileDialog openFile = new OpenFileDialog();
             openFile.CheckFileExists = true;
-            openFile.Filter = "Waveform Files (*.wav)|*.wav;|Dolby Digital AC3 Files (*.ac3)|*.ac3;|Sony Adaptive Transform Acoustic Coding Files (*.at3)|*.at3;";
+            openFile.Filter = "Waveform Files (*.wav)|*.wav;|" +
+                "Dolby Digital AC3 Files (*.ac3)|*.ac3;|" +
+                "Sony Adaptive Transform Acoustic Coding Files (*.at3)|*.at3;|" +
+                "Sony VAG PS-ADPCM (*.vag)|*.vag;|";
 
             if (openFile.ShowDialog() == true)
             {

@@ -52,6 +52,11 @@ namespace SGXLib
                     wave.BitRate_Par1 = audioFormat.GetFrameSize_ForPar1();
                     break;
 
+                case InputAudioFormat.VAG:
+                    audioFormat = VAG.Read(path);
+                    wave.Format = SgxDataFormat.PSADPCM;
+                    break;
+
                 case InputAudioFormat.WAV:
                     audioFormat = Waveform.Read(path);
                     if ((audioFormat as Waveform).BigEndian)
@@ -77,7 +82,7 @@ namespace SGXLib
             string fileName = Path.GetFileNameWithoutExtension(path);
             Console.WriteLine($"Added file: {fileName} ({format})");
 
-            wave.FullFileSize = audioFormat.GetFullFileSize();
+            wave.FullFileSize = audioFormat.GetSizeWithHeaderIfNeededForSGX();
             wave.BodyOffset = audioFormat.GetBodyOffset();
             wave.BodySize = audioFormat.GetBodySize();
             wave.FullPath = path;
@@ -183,7 +188,7 @@ namespace SGXLib
             {
                 read = audioFs.Read(buffer, 0, Math.Min(buffer.Length, size));
 
-                if (wave.Format == SgxDataFormat.LinearPCM_BE && wave.ConvertLeWaveToBe)
+                if (wave.Format == SgxDataFormat.LinearPCM_LE && true)
                 {
                     // WAV le to be test
                     for (int i = 0; i < read; i += 2)
@@ -210,6 +215,10 @@ namespace SGXLib
             if ((magicVal & 0x0000FFFF) == 0x770B)
             {
                 format = InputAudioFormat.AC3;
+            }
+            else if (magicVal == 0x70474156)
+            {
+                format = InputAudioFormat.VAG;
             }
             else if (magicVal == 0x46464952) // RIFF container
             {
@@ -294,6 +303,7 @@ namespace SGXLib
             Unknown,
             AC3,
             WAV,
+            VAG,
             Atrac3Plus
         }
     }

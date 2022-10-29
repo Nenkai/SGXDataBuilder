@@ -19,7 +19,7 @@ namespace SGXLib.AudioFormats
 
         public int GetBodySize();
 
-        public int GetFullFileSize();
+        public int GetSizeWithHeaderIfNeededForSGX();
 
         public int GetBitRate_ForPar0();
 

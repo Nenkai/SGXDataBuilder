@@ -56,7 +56,7 @@ namespace SGXLib.AudioFormats
             return DataSize;
         }
 
-        public int GetFullFileSize()
+        public int GetSizeWithHeaderIfNeededForSGX()
         {
             return FileSize;
         }

@@ -47,7 +47,7 @@ namespace SGXLib.AudioFormats
             return SampleCount * BitsPerSample / 8 * ChannelCount;
         }
 
-        public int GetFullFileSize()
+        public int GetSizeWithHeaderIfNeededForSGX()
         {
             return GetBodySize();
         }
