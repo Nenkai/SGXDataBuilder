@@ -1,6 +1,6 @@
 # SGXDBuilder
 
-This tool allows building SGX audio file banks used in various PSP and PS3 games (sgd/sgh/sgb) from standard audio formats (wav/ac3).
+This tool allows building SGX audio file banks used in various PSP and PS3 games (sgd/sgh/sgb) from standard audio formats.
 
 This is a format and PSP/PS3 Sound Library privately created by Sony/SCE and used in games published by them (listed below) for PSP and PS3 Games.
 It has been superseded by:
@@ -12,12 +12,17 @@ It has been superseded by:
 * Notes (RGND, MIDI/Note playback)
 * Literally anything else, it is a complex format designed to fine tune audio playback
 
+## Supported Input formats:
+* PS-ADPCM [PS3/PSP] - `.vag`
+* AC3 [PS3] - `.ac3`
+* AT3 [PSP] - `.at3`
+* PCM 16 LE [PS3] - `.wav`
+
 ## List of games using SGX:
 * Gran Turismo 5
 * Gran Turismo 6
 * Gran Turismo PSP
   * SE: PS-ADPCM
-  * Extra gSgxSndWaveStrSet name entry
   * Has RGND/SEQD
 * LocoRoco Cocoreccho
 * Ape Escape Move
@@ -25,12 +30,10 @@ It has been superseded by:
 * Kurohyo 1/2 [PSP]
   * SE/Voice: PS-ADPCM
   * BGM: Atrac3PLUS with RIFF header
-  * Extra: gSgxSndWaveStrSet name entry
   * Has WMRK
 * Brave Story - New Traveler [PSP] 
   * SE/Voice: PS-ADPCM
   * BGM: Atrac3PLUS with RIFF header
-  * Extra gSgxSndWaveStrSet name entry
   * Has RGND/SEQD
 * Afrika
 * Bleach: Soul Resurrección
