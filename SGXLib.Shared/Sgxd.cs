@@ -192,7 +192,7 @@ namespace SGXLib
             {
                 read = audioFs.Read(buffer, 0, Math.Min(buffer.Length, size));
 
-                if (wave.Format == SgxDataFormat.LinearPCM_LE && true)
+                if (wave.Format == SgxDataFormat.LinearPCM_LE && wave.ConvertLeWaveToBe)
                 {
                     // WAV le to be test
                     for (int i = 0; i < read; i += 2)
