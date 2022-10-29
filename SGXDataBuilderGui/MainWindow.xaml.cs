@@ -172,20 +172,36 @@ namespace SGXDBuilder.GUI
         {
             if (file.EndsWith(".sgxdproj"))
             {
-                HandleImportProject(file);
+                try
+                {
+                    HandleImportProject(file);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Failed to load project file: {ex.Message}.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
             }
             else
             {
-                SgxdWave wave = _sgxd.AddNewFile(file, System.IO.Path.GetFileNameWithoutExtension(file));
-                var soundEntry = new SoundEntry()
+                try
                 {
-                    Path = System.IO.Path.GetFullPath(file),
-                    Name = wave.Name.Name,
-                    Length = wave.GetLength(),
-                    SGXDWave = wave
-                };
+                    SgxdWave wave = _sgxd.AddNewFile(file, System.IO.Path.GetFileNameWithoutExtension(file));
+                    var soundEntry = new SoundEntry()
+                    {
+                        Path = System.IO.Path.GetFullPath(file),
+                        Name = wave.Name.Name,
+                        Length = wave.GetLength(),
+                        SGXDWave = wave
+                    };
 
-                Entries.Add(soundEntry);
+                    Entries.Add(soundEntry);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Failed to import audio file: {ex.Message}.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
             }
 
             MenuItem_SaveProject.IsEnabled = Entries.Count > 0;

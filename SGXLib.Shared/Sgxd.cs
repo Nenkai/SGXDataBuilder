@@ -155,8 +155,12 @@ namespace SGXLib
             int bodySizeBits = _currentBodySize;
             if (!SplitBody)
             {
-                Console.WriteLine("Splitting body and header (.sgb/.sgh)..");
+                Console.WriteLine("Not splitting SGX File (.sgd)..");
                 bodySizeBits |= (1 << 31);
+            }
+            else
+            {
+                Console.WriteLine("Splitting body and header (.sgb/.sgh)..");
             }
 
             bs.WriteInt32(bodySizeBits);
