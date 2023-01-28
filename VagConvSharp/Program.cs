@@ -39,7 +39,7 @@ namespace VagConvSharp
                 output = Path.ChangeExtension(options.InputWavFile, ".vag");
             }
 
-            if (options.Label.Length > 15)
+            if (options?.Label?.Length > 15)
             {
                 Console.WriteLine("Vag label must not be >15 characters");
                 return;
