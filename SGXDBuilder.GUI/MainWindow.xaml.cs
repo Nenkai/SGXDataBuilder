@@ -186,6 +186,13 @@ namespace SGXDBuilder.GUI
             {
                 try
                 {
+                    string name = System.IO.Path.GetFileNameWithoutExtension(file);
+                    if (_sgxd.HasName(name))
+                    {
+                        MessageBox.Show($"There already is an entry named {name}. Rename it before importing.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
                     SgxdWave wave = _sgxd.AddNewFile(file, System.IO.Path.GetFileNameWithoutExtension(file));
                     var soundEntry = new SoundEntry()
                     {

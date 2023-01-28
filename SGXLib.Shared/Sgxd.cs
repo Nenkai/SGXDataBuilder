@@ -29,6 +29,11 @@ namespace SGXLib
 
         public SgxdWave AddNewFile(string path, string waveName, bool convertLEWaveToBE = false)
         {
+            string fileName = Path.GetFileNameWithoutExtension(path);
+
+            if (HasName(fileName))
+                throw new InvalidOperationException($"Entry '{fileName}' already exists.");
+
             InputAudioFormat format;
             using (var fs = new FileStream(path, FileMode.Open))
                 format = DetectFormat(Path.GetExtension(path), fs);
@@ -79,7 +84,6 @@ namespace SGXLib
 
             Debug.Assert(WaveHeader.Waves.Count < ushort.MaxValue, $"Too many sound files (> {ushort.MaxValue}.");
 
-            string fileName = Path.GetFileNameWithoutExtension(path);
             Console.WriteLine($"Added file: {fileName} ({format})");
 
             wave.FullFileSize = audioFormat.GetSizeWithHeaderIfNeededForSGX();
@@ -96,21 +100,31 @@ namespace SGXLib
             Console.WriteLine($"- Channels: {wave.Channels}");
             Console.WriteLine($"- Sample Count: {wave.WEnd}");
 
-            wave.aBody[0] = _currentBodySize;
-            wave.aBody[1] = _currentBodySize + wave.FullFileSize;
-            _currentBodySize += wave.FullFileSize;
-
             WaveHeader.Waves.Add(wave);
+            UpdateBodySizesAndOffsets();
 
             Console.WriteLine();
 
             return wave;
         }
 
+        public void UpdateBodySizesAndOffsets()
+        {
+            _currentBodySize = 0;
+            foreach (var wave in WaveHeader.Waves)
+            {
+                wave.aBody[0] = _currentBodySize;
+                wave.aBody[1] = _currentBodySize + wave.FullFileSize;
+                _currentBodySize += wave.FullFileSize;
+            }
+        }
+
         public void RemoveWave(SgxdWave wave)
         {
             WaveHeader.Waves.Remove(wave);
             NameHeader.Names.Remove(wave.Name);
+
+            UpdateBodySizesAndOffsets();
         }
 
         public void Build(string path)
@@ -238,6 +252,11 @@ namespace SGXLib
                 
 
             return format;
+        }
+
+        public bool HasName(string name)
+        {
+            return NameHeader.Names.Any(e => e.Name == name);
         }
 
         public void Reset()

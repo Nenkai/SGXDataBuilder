@@ -9,7 +9,7 @@ namespace SGXDBuilder.CLI
 {
     public class Program
     {
-        public static string Version = "2.0.0";
+        public static string Version = "2.0.1";
 
         public static void Main(string[] args)
         {
