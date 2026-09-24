@@ -5,8 +5,19 @@ This tool allows building SGX audio file banks used in various PSP and PS3 games
 This is a format and PSP/PS3 Sound Library privately created by Sony/SCE and used in games published by them (listed below) for PSP and PS3 Games. This tool focuses on the `SGX` variant found in PS3 and PSP games.
 
 It has been superseded by:
-* `SXD` (aka `sndx`, `sceSndx`) - PS Vita/PS4 (Gran Turismo Sport, Gravity Rush, Freedom Wars, Soul Sacrifice)
-* `SZD` (aka `sndz`, `sceSndz`) - PS4/PS5 (Gran Turismo 7, Astro's Playroom)
+* `SXD` (aka `sndx`, `sceSndx` with file extensions `.sxd1`/`.sxd2`/`.sxd3`) - PS Vita/PS4, used in:
+  * Gran Turismo Sport (PS4)
+  * Gravity Rush (PS4)
+  * Freedom Wars (PSV)
+  * Soul Sacrifice (PSV)
+  * Everybody's Golf VR (PS4)
+  * The Last Guardian (PS4)
+  * Fate/Estella (PS4)
+  * Network Media Player [PCSF00635] (PSV)
+  * Welcome Park [NPXS10007] (PSV)
+* And then `SZD` (aka `sndz`, `sceSndz`) - PS4/PS5, used in:
+  * Gran Turismo 7 (PS4/PS5)
+  * Astro's Playroom (PS5)
 
 ## Unsupported features
 * Sequenced Chunks/Files (SEQD)
@@ -43,6 +54,7 @@ It has been superseded by:
 * White Knight Chronicles I & II
 * Tokyo Jungle
 * Rain
+* Kung Fu Rider
 
 For SGXD playback, refer to [vgmstream](https://github.com/vgmstream/vgmstream).
 The format has been [mostly documented](https://github.com/Nenkai/SGXDataBuilder/blob/master/SGXDBuilder/SGXD.bt) with debug symbols from Folklore, PS3
