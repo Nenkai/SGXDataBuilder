@@ -60,3 +60,14 @@ It has been superseded by:
 
 For SGXD playback, refer to [vgmstream](https://github.com/vgmstream/vgmstream).
 The format has been [mostly documented](https://github.com/Nenkai/SGXDataBuilder/blob/master/SGXDBuilder/SGXD.bt) with debug symbols from Folklore, PS3
+
+## General understanding of the formats (including SNDX/SZD)
+
+A general SGX is composed of chunks, which will be read in this hierarchy in order to play music:
+
+* Names - Defines a track by name, will point to one of the following (for example)
+  * Wave - Waveform file (direct sound sample)
+  * Region/Sequence - Midi, will point back to waveforms for instrument samples
+  * Trans
+ 
+In `sndx`, Names point to a "Request" list instead, which will then point to Waves/Sequences/Trans
