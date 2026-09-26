@@ -13,6 +13,8 @@ It has been superseded by:
   * Everybody's Golf VR (PS4)
   * The Last Guardian (PS4)
   * Fate/Estella (PS4)
+  * Chaos Rings 2 (PSV)
+  * Chaos Rings 3 (PSV)
   * Network Media Player [PCSF00635] (PSV)
   * Welcome Park [NPXS10007] (PSV)
 * And then `SZD` (aka `sndz`, `sceSndz`) - PS4/PS5, used in:
