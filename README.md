@@ -10,6 +10,7 @@ It has been superseded by:
   * Gravity Rush (PS4)
   * Freedom Wars (PSV)
   * Soul Sacrifice (PSV)
+  * Astro Bot Rescue Mission (PS4)
   * Everybody's Golf VR (PS4)
   * The Last Guardian (PS4)
   * Fate/Estella (PS4)
