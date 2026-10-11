@@ -6,21 +6,24 @@ This is a format and PSP/PS3 Sound Library privately created by Sony/SCE and use
 
 It has been superseded by:
 * `SXD` (aka `sndx`, `sceSndx` with file extensions `.sxd1`/`.sxd2`/`.sxd3`) - PS Vita/PS4, used in:
-  * Gran Turismo Sport (PS4)
-  * Gravity Rush (PS4)
-  * Freedom Wars (PSV)
-  * Soul Sacrifice (PSV)
   * Astro Bot Rescue Mission (PS4)
   * Everybody's Golf VR (PS4)
-  * The Last Guardian (PS4)
   * Fate/Estella (PS4)
+  * Gran Turismo Sport (PS4)
+  * Gravity Rush (PS4)
+  * Knack (PS4)
+  * Knack II (PS4)
+  * The Last Guardian (PS4)
   * Chaos Rings 2 (PSV)
   * Chaos Rings 3 (PSV)
+  * Freedom Wars (PSV)
   * Network Media Player [PCSF00635] (PSV)
+  * Soul Sacrifice (PSV)
   * Welcome Park [NPXS10007] (PSV)
+  
 * And then `SZD` (aka `sndz`, `sceSndz`) - PS4/PS5, used in:
-  * Gran Turismo 7 (PS4/PS5)
   * Astro's Playroom (PS5)
+  * Gran Turismo 7 (PS4/PS5)
 
 ## Unsupported features
 * Sequenced Chunks/Files (SEQD)
