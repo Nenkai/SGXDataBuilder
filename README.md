@@ -63,7 +63,13 @@ It has been superseded by:
 * Kung Fu Rider
 
 For SGXD playback, refer to [vgmstream](https://github.com/vgmstream/vgmstream).
-The format has been [mostly documented](https://github.com/Nenkai/SGXDataBuilder/blob/master/SGXDBuilder/SGXD.bt) with debug symbols from Folklore, PS3
+
+## Format Documentation
+
+SGX/SGD and libSndx/SNDX/SXD has been mostly documented [here](https://github.com/Nenkai/010GameTemplates/tree/main/Sony).
+
+* For SGD, the format was mostly documented with debug symbols from Folklore, PS3.
+* For SNDX, GT Sport 1.68 was used (files + code reverse engineering), as well as Astro Bot Rescue Mission (PS4) and Welcome Park (PSV).
 
 ## General understanding of the formats (including SNDX/SZD)
 
