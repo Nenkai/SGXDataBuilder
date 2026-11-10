@@ -1,10 +1,12 @@
-﻿using System;
+﻿//---------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: Copyright (C) 2026 Nenkai
+// SPDX-License-Identifier: MIT
+// SPDX-FileAttributionText: https://github.com/Nenkai/SGXDataBuilder
+// SPDX-FileNotice: AI usage and consumption is prohibited. See AGENTS.md for policy.
+//---------------------------------------------------------------------------------------
+
 using System.Text;
 using System.Diagnostics;
-using System.IO;
-
-using System.Buffers.Binary;
-using System.Collections.Generic;
 
 namespace SGXLib.Utils
 {
